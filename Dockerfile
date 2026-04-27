@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y \
     libstdc++6 \
     libgomp1 \
     libespeak-ng1 \
+    espeak-ng \
+    espeak-ng-data \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -22,19 +24,20 @@ RUN wget -O piper.tar.gz https://github.com/rhasspy/piper/releases/latest/downlo
     && rm -rf piper.tar.gz piper \
     && ldconfig
 
-# Fix library path
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 
-# Create folders
+# folders
 RUN mkdir -p /app/output
 RUN mkdir -p /app/voices/en_US
 
-# Download models from GitHub Releases
-RUN wget -O /app/voices/en_US/en_US-john-medium.onnx "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx" \
-    && wget -O /app/voices/en_US/en_US-john-medium.onnx.json "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx.json"
+# Download model
+RUN wget -O /app/voices/en_US/en_US-john-medium.onnx \
+    "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx" \
+    && wget -O /app/voices/en_US/en_US-john-medium.onnx.json \
+    "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx.json"
 
-# Copy app
 COPY app.py .
+
 
 # Run server
 CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port $PORT"]
