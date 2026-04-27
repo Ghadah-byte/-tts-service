@@ -29,12 +29,12 @@ ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
 RUN mkdir -p /app/output
 RUN mkdir -p /app/voices/en_US
 
-#  GitHub Releases 
+# Download models from GitHub Releases
 RUN wget -O /app/voices/en_US/en_US-john-medium.onnx "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx" \
     && wget -O /app/voices/en_US/en_US-john-medium.onnx.json "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx.json"
 
- COPY app.py .
-
+# Copy app
+COPY app.py .
 
 # Run server
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5002"]
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port $PORT"]
