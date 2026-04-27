@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 import subprocess
 import uuid
@@ -6,11 +6,26 @@ import os
 
 app = FastAPI()
 
+# API Key من البيئة (Render / Docker env)
+API_KEY = os.getenv("API_KEY")
+
 class Request(BaseModel):
     text: str
 
+
+def verify_api_key(x_api_key: str):
+    if not API_KEY:
+        raise HTTPException(status_code=500, detail="API_KEY not set on server")
+
+    if x_api_key != API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+
 @app.post("/tts")
-def tts(req: Request):
+def tts(req: Request, x_api_key: str = Header(None)):
+
+    # 🔐 API Key check
+    verify_api_key(x_api_key)
 
     os.makedirs("/app/output", exist_ok=True)
 
@@ -27,7 +42,7 @@ def tts(req: Request):
     try:
         result = subprocess.run(
             command,
-            input=req.text,   # صح
+            input=req.text,
             text=True,
             capture_output=True
         )
