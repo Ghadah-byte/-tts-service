@@ -6,7 +6,6 @@ import os
 
 app = FastAPI()
 
-# API Key من البيئة (Render / Docker env)
 API_KEY = os.getenv("API_KEY")
 
 class Request(BaseModel):
@@ -24,7 +23,6 @@ def verify_api_key(x_api_key: str):
 @app.post("/tts")
 def tts(req: Request, x_api_key: str = Header(None)):
 
-    # 🔐 API Key check
     verify_api_key(x_api_key)
 
     os.makedirs("/app/output", exist_ok=True)
