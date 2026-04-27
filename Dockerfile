@@ -33,7 +33,7 @@ RUN mkdir -p /app/voices/en_US
 RUN wget -O /app/voices/en_US/en_US-john-medium.onnx "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx" \
     && wget -O /app/voices/en_US/en_US-john-medium.onnx.json "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx.json"
 
-# COPY app.py .
+ COPY app.py .
 
 
 # Run server
