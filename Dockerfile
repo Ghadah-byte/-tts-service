@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 WORKDIR /app
 
-# System dependencies
+# System dependencies (FIXED)
 RUN apt-get update && apt-get install -y \
     python3 python3-pip wget ffmpeg \
     libstdc++6 \
@@ -24,7 +24,9 @@ RUN wget -O piper.tar.gz https://github.com/rhasspy/piper/releases/latest/downlo
     && rm -rf piper.tar.gz piper \
     && ldconfig
 
+# 🔥 مهم جداً: إصلاح espeak path
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+ENV ESPEAK_DATA_PATH=/usr/share/espeak-ng-data
 
 # folders
 RUN mkdir -p /app/output
@@ -32,12 +34,10 @@ RUN mkdir -p /app/voices/en_US
 
 # Download model
 RUN wget -O /app/voices/en_US/en_US-john-medium.onnx \
-    "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx" \
+    https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx \
     && wget -O /app/voices/en_US/en_US-john-medium.onnx.json \
-    "https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx.json"
+    https://github.com/Ghadah-byte/-tts-service/releases/download/v1.0/en_US-john-medium.onnx.json
 
 COPY app.py .
 
-
-# Run server
 CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port $PORT"]
