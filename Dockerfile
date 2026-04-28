@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 WORKDIR /app
 
-# System dependencies (FIXED)
+# System dependencies
 RUN apt-get update && apt-get install -y \
     python3 python3-pip wget ffmpeg \
     libstdc++6 \
@@ -24,8 +24,7 @@ RUN wget -O piper.tar.gz https://github.com/rhasspy/piper/releases/latest/downlo
     && rm -rf piper.tar.gz piper \
     && ldconfig
 
-# 🔥 مهم جداً: إصلاح espeak path
-# 🔥 FIX FINAL
+# ✅ FIX النهائي
 ENV LD_LIBRARY_PATH=/usr/local/lib
 ENV ESPEAK_DATA_PATH=/usr/lib/x86_64-linux-gnu/espeak-ng-data
 
