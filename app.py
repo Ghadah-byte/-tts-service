@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Header, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import subprocess
 import uuid
@@ -8,10 +9,12 @@ app = FastAPI()
 
 API_KEY = os.getenv("API_KEY")
 
+
 class Request(BaseModel):
     text: str
 
 
+# ------------------ AUTH ------------------
 def verify_api_key(x_api_key: str):
     if not API_KEY:
         raise HTTPException(status_code=500, detail="API_KEY not set on server")
@@ -20,6 +23,7 @@ def verify_api_key(x_api_key: str):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
+# ------------------ TTS ENDPOINT ------------------
 @app.post("/tts")
 def tts(req: Request, x_api_key: str = Header(None)):
 
@@ -27,7 +31,8 @@ def tts(req: Request, x_api_key: str = Header(None)):
 
     os.makedirs("/app/output", exist_ok=True)
 
-    output = f"/app/output/{uuid.uuid4()}.wav"
+    filename = f"{uuid.uuid4()}.wav"
+    output = f"/app/output/{filename}"
 
     command = [
         "piper",
@@ -51,7 +56,22 @@ def tts(req: Request, x_api_key: str = Header(None)):
                 "stdout": result.stdout
             }
 
-        return {"audio": output}
+        # ✅ رجّع رابط بدل path
+        return {
+            "audio_url": f"https://tts-service-4830.onrender.com/audio/{filename}"
+        }
 
     except Exception as e:
         return {"exception": str(e)}
+
+
+# ------------------ AUDIO FILE SERVER ------------------
+@app.get("/audio/{filename}")
+def get_audio(filename: str):
+
+    file_path = f"/app/output/{filename}"
+
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Audio not found")
+
+    return FileResponse(file_path, media_type="audio/wav")
