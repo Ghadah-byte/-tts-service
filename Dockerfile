@@ -25,8 +25,9 @@ RUN wget -O piper.tar.gz https://github.com/rhasspy/piper/releases/latest/downlo
     && ldconfig
 
 # 🔥 مهم جداً: إصلاح espeak path
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-ENV ESPEAK_DATA_PATH=/usr/share/espeak-ng-data
+# 🔥 FIX FINAL
+ENV LD_LIBRARY_PATH=/usr/local/lib
+ENV ESPEAK_DATA_PATH=/usr/lib/x86_64-linux-gnu/espeak-ng-data
 
 # folders
 RUN mkdir -p /app/output
